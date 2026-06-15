@@ -5,6 +5,7 @@ import os
 import torch
 import matplotlib.pyplot as plt
 
+import yaml
 import numpy as np
 
 # from brainspy.algorithm_manager import get_algorithm
@@ -136,6 +137,11 @@ def generate_surrogate_model(
     init_seed(configs)
     results_dir = create_directory_timestamp(configs["results_base_dir"],
                                              main_folder)
+    
+    # Save a copy of the configuration file
+    config_path = os.path.join(results_dir, 'training.yaml')
+    with open(config_path, 'w') as f:
+        yaml.dump(configs, f, sort_keys=False)
 
     # Get training, validation and test data
     # Get amplification of the device and the info
