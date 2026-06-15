@@ -51,7 +51,7 @@ def generate_surrogate_model(
         configs: dict,
         custom_model: torch.nn.Module = NeuralNetworkModel,
         criterion: torch.nn.modules.loss._Loss = MSELoss(),
-        custom_optimizer: torch.optim.Optimizer = Adam,
+        optimizer_class: torch.optim.Optimizer = Adam,
         main_folder: str = "training_data") -> None:
     """
     It loads the training and validation datasets from the npz file specified
@@ -147,11 +147,30 @@ def generate_surrogate_model(
     model = TorchUtils.format(model)
 
     # Initialise optimiser
-    optimizer = custom_optimizer(
+    optim_name = configs['hyperparameters']['optimizer']
+
+    # Set optimizer
+    try:
+        optimizer_class = getattr(torch.optim, optim_name)
+    except AttributeError:
+        raise ValueError(f"Optimizer '{optim_name}' is not a valid class in torch.optim")
+    
+
+    optimizer = optimizer_class(
         filter(lambda p: p.requires_grad, model.parameters()),
         lr=configs["hyperparameters"]["learning_rate"],
-        betas=(0.9, 0.75),
-    )
+        weight_decay = configs["hyperparameters"]["weight_decay"],
+)
+    
+    # Set criterion
+    criterion_name = configs['hyperparameters']['criterion']
+
+    try:
+        criterion_class = getattr(torch.nn.modules.loss, criterion_name)
+    except AttributeError:
+        raise ValueError(f"Loss '{criterion_name}' is not a valid class in torch.nn.modules.loss")
+    
+    criterion = criterion_class(reduction='mean')
 
     # Whole training loop
     model, performances, saved_dir = train_loop(
