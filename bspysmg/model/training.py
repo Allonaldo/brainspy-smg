@@ -203,19 +203,21 @@ def generate_surrogate_model(
                 label=labels[i],
             )
 
+    # Make training profile plot
     plt.figure()
+
     plt.plot(TorchUtils.to_numpy(performances[0]))
     if len(performances) > 1 and not len(performances[1]) == 0:
         plt.plot(TorchUtils.to_numpy(performances[1]))
     if dataloaders[-1].tag == 'test':
         plt.plot(np.ones(len(performances[-1])) * TorchUtils.to_numpy(loss))
-        plt.title("Training profile /n Test loss : %.6f (nA)" % loss)
+        plt.title(f"Training profile \n Test loss: {loss.item():.6f}")
     else:
         plt.title("Training profile")
     if not len(performances[1]) == 0:
         plt.legend(["training", "validation"])
     plt.xlabel("Epoch no.")
-    plt.ylabel("RMSE (nA)")
+    plt.ylabel(f"{criterion_name}")
     plt.savefig(os.path.join(results_dir, "training_profile"))
     if not dataloaders[-1].tag == 'train':
         training_data = torch.load(
@@ -224,7 +226,8 @@ def generate_surrogate_model(
         torch.save(training_data, os.path.join(results_dir,
                                                "training_data.pt"))
     # print("Model saved in :" + results_dir)
-    return saved_dir
+    plt.grid()
+    return saved_dir, optimizer
 
 
 def train_loop(
@@ -537,6 +540,20 @@ def postprocess(dataloader: torch.utils.data.DataLoader,
     all_predictions = TorchUtils.to_numpy(torch.cat(all_predictions, dim=0))
 
     error = all_targets - all_predictions
+
+    # Generate column names
+    pred_cols = [f"pred{i}" for i in range(all_predictions.shape[1])]
+    target_cols = [f"target{i}" for i in range(all_targets.shape[1])]
+    header_string = ",".join(pred_cols + target_cols)
+
+
+    # Save all predictions and targets
+    np.savetxt(os.path.join(results_dir, 'preds_targets.csv'),
+               np.hstack((all_predictions, all_targets)),
+               delimiter=',',
+               header=header_string,
+               comments=''
+               )
 
     plot_error_vs_output(
         all_targets,
