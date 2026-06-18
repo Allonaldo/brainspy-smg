@@ -34,12 +34,12 @@ def plot_errors_per_electrode(targets,
         rmse = root_mean_squared_error(targets[:,i], preds[:,i])
         mae = mean_absolute_error(targets[:,i], preds[:,i])
         axs[i].set_title(f"Electrode {i} \nMAE: {mae:.3f} \nRMSE: {rmse:.3f}")
+        axs[i].grid()
 
     if num_electrodes % 2 == 1:
         axs[-1].set_visible(False)
 
     plt.legend()
-    plt.grid()
     plt.tight_layout()
     plt.savefig(fig_loc, dpi=300)
     plt.close()
@@ -72,26 +72,60 @@ def plot_error_hist(targets: np.array,
     assert targets.size == error.size
     assert mse >= 0
     
-    plt.figure()
-    plt.title('Predicted vs True values')
-    plt.subplot(1, 2, 1)
-    plt.plot(targets, prediction, ".")
-    plt.xlabel("True Output (nA)")
-    plt.ylabel("Predicted Output (nA)")
-    targets_and_prediction_array = np.concatenate((targets, prediction))
-    min_out = np.min(targets_and_prediction_array)
-    max_out = np.max(targets_and_prediction_array)
-    plt.plot(np.linspace(min_out, max_out), np.linspace(min_out, max_out), "k")
-    plt.title(f"RMSE {np.sqrt(mse)} (nA)")
-    plt.subplot(1, 2, 2)
-    plt.hist(np.reshape(error, error.size), 500)
-    x_lim = 0.25 * np.max([np.abs(error.min()), error.max()])
-    plt.xlim([-x_lim, x_lim])
-    plt.title("Error histogram (nA) ")
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    fig.suptitle('Predicted vs True values', fontsize=14)
+
+    num_electrodes = targets.shape[1]
+    for i in range(num_electrodes):
+        ax1.plot(targets[:, i], prediction[:, i], ".", alpha=0.6, label=f'Elec {i}')
+
+    ax1.set_xlabel("True Output (nA)")
+    ax1.set_ylabel("Predicted Output (nA)")
+
+    min_out = min(targets.min(), prediction.min())
+    max_out = max(targets.max(), prediction.max())
+    ax1.plot([min_out, max_out], [min_out, max_out], "k--", alpha=0.7, label="Ideal")
+
+    ax1.set_title(f"RMSE: {np.sqrt(mse):.3f} (nA)")
+    ax1.grid(True)
+    ax1.legend(loc="upper left", bbox_to_anchor=(1, 1))
+
+    ax2.hist(error.ravel(), bins=500, color='gray', edgecolor='none')
+    ax2.set_xlabel("Error (nA)")
+    ax2.set_ylabel("Counts")
+
+    max_err_mag = max(abs(error.min()), abs(error.max()))
+    x_lim = 0.25 * max_err_mag
+    ax2.set_xlim([-x_lim, x_lim])
+
+    ax2.set_title("Error histogram (nA)")
+    ax2.grid(True)
+
     fig_loc = os.path.join(save_dir, name)
     plt.tight_layout()
-    plt.savefig(fig_loc, dpi=300)
+    plt.savefig(fig_loc, dpi=300, bbox_inches='tight')
     plt.close()
+    
+    # plt.figure()
+    # plt.title('Predicted vs True values')
+    # plt.subplot(1, 2, 1)
+    # plt.plot(targets, prediction, ".")
+    # plt.xlabel("True Output (nA)")
+    # plt.ylabel("Predicted Output (nA)")
+    # targets_and_prediction_array = np.concatenate((targets, prediction))
+    # min_out = np.min(targets_and_prediction_array)
+    # max_out = np.max(targets_and_prediction_array)
+    # plt.plot(np.linspace(min_out, max_out), np.linspace(min_out, max_out), "k")
+    # plt.title(f"RMSE {np.sqrt(mse)} (nA)")
+    # plt.subplot(1, 2, 2)
+    # plt.hist(np.reshape(error, error.size), 500)
+    # x_lim = 0.25 * np.max([np.abs(error.min()), error.max()])
+    # plt.xlim([-x_lim, x_lim])
+    # plt.title("Error histogram (nA) ")
+    # fig_loc = os.path.join(save_dir, name)
+    # plt.tight_layout()
+    # plt.savefig(fig_loc, dpi=300)
+    # plt.close()
 
 
 def plot_error_vs_output(targets: np.array,
