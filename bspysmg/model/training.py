@@ -153,7 +153,8 @@ def generate_surrogate_model(
     model = TorchUtils.format(model)
 
     # Initialise optimiser
-    optim_name = configs['hyperparameters']['optimizer']
+    # optim_name = configs['hyperparameters']['optimizer']
+    optim_name = configs.get('hyperparameters', {}).get('optimizer', 'Adam')
 
     # Set optimizer
     try:
@@ -169,7 +170,8 @@ def generate_surrogate_model(
 )
     
     # Set criterion
-    criterion_name = configs['hyperparameters']['criterion']
+    # criterion_name = configs['hyperparameters']['criterion']
+    criterion_name = configs.get('hyperparameters', {}).get('criterion', 'MSELoss')
 
     try:
         criterion_class = getattr(torch.nn.modules.loss, criterion_name)
