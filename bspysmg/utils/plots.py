@@ -5,6 +5,7 @@ from cProfile import label
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.metrics import mean_absolute_error, root_mean_squared_error
 
 import torch
 from brainspy.utils.waveform import WaveformManager
@@ -15,7 +16,6 @@ def plot_errors_per_electrode(targets,
                               name: str = "error_per_electrode") -> None:
     
     fig_loc = os.path.join(save_dir, name)
-    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
     # Make the plot
     num_electrodes = targets.shape[1]
     fig, axs = plt.subplots(2, round(num_electrodes/2), squeeze=True)
@@ -24,11 +24,22 @@ def plot_errors_per_electrode(targets,
     fig.set_size_inches((12,8))
     plt.setp(axs, xlabel='True Currents (nA)', ylabel='Predicted Currents (nA)')
     for i in range(num_electrodes):
+
+        min_val = min(targets[:,i].min(), preds[:,i].min())
+        max_val = max(targets[:,i].max(), preds[:,i].max())
+
+        # plot ideal line
+        axs[i].plot([min_val, max_val], [min_val, max_val], '--k', label="Ideal" if i==0 else "")
         axs[i].plot(targets[:,i], preds[:,i], '.', color=f'C{i}')
+        rmse = root_mean_squared_error(targets[:,i], preds[:,i])
+        mae = mean_absolute_error(targets[:,i], preds[:,i])
+        axs[i].set_title(f"Electrode {i} \nMAE: {mae} \nRMSE: {rmse}")
 
     if num_electrodes % 2 == 1:
         axs[-1].set_visible(False)
 
+    plt.legend()
+    plt.grid()
     plt.tight_layout()
     plt.savefig(fig_loc, dpi=300)
     plt.close()
