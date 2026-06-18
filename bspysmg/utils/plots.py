@@ -1,6 +1,7 @@
 """
 File containing several methods for plotting purposes.
 """
+from cProfile import label
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -8,6 +9,24 @@ import matplotlib.pyplot as plt
 import torch
 from brainspy.utils.waveform import WaveformManager
 
+def plot_errors_per_electrode(targets,
+                              preds,
+                              save_dir,
+                              name: str = "error_per_electrode") -> None:
+    
+    fig_loc = os.path.join(save_dir, name)
+    print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+    # Make the plot
+    num_electrodes = targets.shape[1]
+    fig, axs = plt.subplots(2, round(num_electrodes/2), squeeze=True)
+    fig.set_size_inches((12,8))
+    plt.setp(axs, xlabel='True Currents (nA)', ylabel='Predicted Currents (nA)')
+    for i in range(num_electrodes):
+        axs[i].plot(targets[:,i], preds[:,i], '.', color=f'C{i}')
+
+    plt.tight_layout()
+    plt.savefig(fig_loc, dpi=300)
+    plt.close()
 
 def plot_error_hist(targets: np.array,
                     prediction: np.array,
@@ -36,6 +55,7 @@ def plot_error_hist(targets: np.array,
     assert targets.size == prediction.size
     assert targets.size == error.size
     assert mse >= 0
+    
     plt.figure()
     plt.title('Predicted vs True values')
     plt.subplot(1, 2, 1)
@@ -79,7 +99,10 @@ def plot_error_vs_output(targets: np.array,
     """
     assert targets.size == error.size
     plt.figure()
-    plt.plot(targets, error, ".")
+
+
+    for elec in range(targets.shape[1]):
+        plt.plot(targets[:,elec], error[:,elec], ".", label=f'Electrode {elec}')
     plt.plot(
         np.linspace(
             targets.min(),
@@ -91,6 +114,7 @@ def plot_error_vs_output(targets: np.array,
     plt.title("Error vs Output")
     plt.xlabel("Output (nA)")
     plt.ylabel("Error (nA)")
+    plt.grid()
     fig_loc = os.path.join(save_dir, name)
     plt.savefig(fig_loc, dpi=300)
     plt.close()

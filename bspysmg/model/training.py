@@ -19,7 +19,7 @@ from brainspy.utils.pytorch import TorchUtils
 from brainspy.utils.io import create_directory_timestamp
 from brainspy.processors.simulation.model import NeuralNetworkModel
 from bspysmg.data.dataset import get_dataloaders
-from bspysmg.utils.plots import plot_error_vs_output, plot_error_hist
+from bspysmg.utils.plots import plot_error_vs_output, plot_error_hist, plot_errors_per_electrode
 from typing import Tuple, List
 
 
@@ -546,7 +546,6 @@ def postprocess(dataloader: torch.utils.data.DataLoader,
     target_cols = [f"target{i}" for i in range(all_targets.shape[1])]
     header_string = ",".join(pred_cols + target_cols)
 
-
     # Save all predictions and targets
     np.savetxt(os.path.join(results_dir, 'preds_targets.csv'),
                np.hstack((all_predictions, all_targets)),
@@ -554,6 +553,11 @@ def postprocess(dataloader: torch.utils.data.DataLoader,
                header=header_string,
                comments=''
                )
+
+    plot_errors_per_electrode(all_targets, 
+                              all_predictions, 
+                              results_dir)
+    
 
     plot_error_vs_output(
         all_targets,
