@@ -211,7 +211,7 @@ def generate_surrogate_model(
         plt.plot(TorchUtils.to_numpy(performances[1]))
     if dataloaders[-1].tag == 'test':
         plt.plot(np.ones(len(performances[-1])) * TorchUtils.to_numpy(loss))
-        plt.title(f"Training profile \n Test loss: {loss.item():.6f}")
+        plt.title(f"Training profile \n Test loss: {loss.item():.3f}")
     else:
         plt.title("Training profile")
     if not len(performances[1]) == 0:
