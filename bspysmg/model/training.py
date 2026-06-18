@@ -153,7 +153,6 @@ def generate_surrogate_model(
     model = TorchUtils.format(model)
 
     # Initialise optimiser
-    # optim_name = configs['hyperparameters']['optimizer']
     optim_name = configs.get('hyperparameters', {}).get('optimizer', 'Adam')
 
     # Set optimizer
@@ -166,11 +165,10 @@ def generate_surrogate_model(
     optimizer = optimizer_class(
         filter(lambda p: p.requires_grad, model.parameters()),
         lr=configs["hyperparameters"]["learning_rate"],
-        weight_decay = configs["hyperparameters"]["weight_decay"],
+        weight_decay = configs.get('hyperparameters', {}).get('weight_decay', 0),
 )
     
     # Set criterion
-    # criterion_name = configs['hyperparameters']['criterion']
     criterion_name = configs.get('hyperparameters', {}).get('criterion', 'MSELoss')
 
     try:
