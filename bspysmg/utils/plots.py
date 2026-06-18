@@ -33,7 +33,7 @@ def plot_errors_per_electrode(targets,
         axs[i].plot(targets[:,i], preds[:,i], '.', color=f'C{i}')
         rmse = root_mean_squared_error(targets[:,i], preds[:,i])
         mae = mean_absolute_error(targets[:,i], preds[:,i])
-        axs[i].set_title(f"Electrode {i} \nMAE: {mae} \nRMSE: {rmse}")
+        axs[i].set_title(f"Electrode {i} \nMAE: {mae:.3f} \nRMSE: {rmse:.3f}")
 
     if num_electrodes % 2 == 1:
         axs[-1].set_visible(False)
