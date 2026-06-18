@@ -218,6 +218,7 @@ def generate_surrogate_model(
         plt.legend(["training", "validation"])
     plt.xlabel("Epoch no.")
     plt.ylabel(f"{criterion_name}")
+    plt.grid()
     plt.savefig(os.path.join(results_dir, "training_profile"))
     if not dataloaders[-1].tag == 'train':
         training_data = torch.load(
@@ -226,7 +227,6 @@ def generate_surrogate_model(
         torch.save(training_data, os.path.join(results_dir,
                                                "training_data.pt"))
     # print("Model saved in :" + results_dir)
-    plt.grid()
     return saved_dir, optimizer
 
 
