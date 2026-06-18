@@ -29,8 +29,8 @@ def plot_errors_per_electrode(targets,
         max_val = max(targets[:,i].max(), preds[:,i].max())
 
         # plot ideal line
-        axs[i].plot([min_val, max_val], [min_val, max_val], '--k', label="Ideal" if i==0 else "")
         axs[i].plot(targets[:,i], preds[:,i], '.', color=f'C{i}')
+        axs[i].plot([min_val, max_val], [min_val, max_val], '--k', label="Ideal" if i==0 else "")
         rmse = root_mean_squared_error(targets[:,i], preds[:,i])
         mae = mean_absolute_error(targets[:,i], preds[:,i])
         axs[i].set_title(f"Electrode {i} \nMAE: {mae:.3f} \nRMSE: {rmse:.3f}")
