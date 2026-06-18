@@ -86,7 +86,7 @@ def plot_error_hist(targets: np.array,
     max_out = max(targets.max(), prediction.max())
     ax1.plot([min_out, max_out], [min_out, max_out], "k--", alpha=0.7, label="Ideal")
 
-    ax1.set_title(f"RMSE: {np.sqrt(mse):.3f} (nA)")
+    ax1.set_title(f"RMSE: {np.sqrt(mse.item()):.3f} (nA)")
     ax1.grid(True)
     ax1.legend(loc="upper left", bbox_to_anchor=(1, 1))
 
@@ -105,7 +105,7 @@ def plot_error_hist(targets: np.array,
     plt.tight_layout()
     plt.savefig(fig_loc, dpi=300, bbox_inches='tight')
     plt.close()
-    
+
     # plt.figure()
     # plt.title('Predicted vs True values')
     # plt.subplot(1, 2, 1)
