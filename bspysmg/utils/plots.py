@@ -19,10 +19,15 @@ def plot_errors_per_electrode(targets,
     # Make the plot
     num_electrodes = targets.shape[1]
     fig, axs = plt.subplots(2, round(num_electrodes/2), squeeze=True)
+    axs = axs.flatten()
+
     fig.set_size_inches((12,8))
     plt.setp(axs, xlabel='True Currents (nA)', ylabel='Predicted Currents (nA)')
     for i in range(num_electrodes):
         axs[i].plot(targets[:,i], preds[:,i], '.', color=f'C{i}')
+
+    if num_electrodes % 2 == 1:
+        axs[-1].set_visible(False)
 
     plt.tight_layout()
     plt.savefig(fig_loc, dpi=300)
