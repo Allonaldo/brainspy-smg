@@ -217,7 +217,7 @@ def generate_surrogate_model(
     if not len(performances[1]) == 0:
         plt.legend(["training", "validation"])
     plt.xlabel("Epoch no.")
-    plt.ylabel(f"{criterion_name}")
+    plt.ylabel(f"RMSE (nA)")
     plt.grid()
     plt.savefig(os.path.join(results_dir, "training_profile"))
     if not dataloaders[-1].tag == 'train':
