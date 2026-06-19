@@ -1,7 +1,6 @@
 """
 File containing several methods for plotting purposes.
 """
-from cProfile import label
 import os
 import numpy as np
 import matplotlib.pyplot as plt
